@@ -13,8 +13,8 @@ const Navbar = () => {
     const navLinks = [
         { name: 'Home', path: '/' },
         { name: 'Hotels', path: '/rooms' },
-        { name: 'Experience', path: '/' },
-        { name: 'About', path: '/' },
+        { name: 'Experience', path: '/', anchor: 'experience' },
+        { name: 'About', path: '/', anchor: 'about' },
     ];
 
 
@@ -25,6 +25,27 @@ const Navbar = () => {
     const {user} = useUser()
     const navigate = useNavigate()
     const location = useLocation()
+
+    const scrollToSection = (id) => {
+        const element = document.getElementById(id)
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' })
+        }
+    }
+
+    const handleNavClick = (link) => {
+        if (link.anchor) {
+            if (location.pathname === '/') {
+                scrollToSection(link.anchor)
+            } else {
+                navigate('/')
+                setTimeout(() => scrollToSection(link.anchor), 120)
+            }
+        } else {
+            navigate(link.path)
+        }
+        setIsMenuOpen(false)
+    }
 
     useEffect(() => {
 
@@ -54,10 +75,17 @@ const Navbar = () => {
                 {/* Desktop Nav */}
                 <div className="hidden md:flex items-center gap-4 lg:gap-8">
                     {navLinks.map((link, i) => (
-                        <Link key={i} to={link.path} className={`group flex flex-col gap-0.5 ${isScrolled ? "text-gray-700" : "text-white"}`}>
-                            {link.name}
-                            <div className={`${isScrolled ? "bg-gray-700" : "bg-white"} h-0.5 w-0 group-hover:w-full transition-all duration-300`} />
-                        </Link>
+                        link.anchor ? (
+                            <button key={i} type="button" onClick={() => handleNavClick(link)} className={`group flex flex-col gap-0.5 ${isScrolled ? "text-gray-700" : "text-white"}`}>
+                                {link.name}
+                                <div className={`${isScrolled ? "bg-gray-700" : "bg-white"} h-0.5 w-0 group-hover:w-full transition-all duration-300`} />
+                            </button>
+                        ) : (
+                            <Link key={i} to={link.path} className={`group flex flex-col gap-0.5 ${isScrolled ? "text-gray-700" : "text-white"}`}>
+                                {link.name}
+                                <div className={`${isScrolled ? "bg-gray-700" : "bg-white"} h-0.5 w-0 group-hover:w-full transition-all duration-300`} />
+                            </Link>
+                        )
                     ))}
                     <button className={`border px-4 py-1 text-sm font-light rounded-full cursor-pointer ${isScrolled ? 'text-black' : 'text-white'} transition-all`} onClick={()=> navigate('/owner')}>
                     Dashboard
@@ -103,9 +131,15 @@ const Navbar = () => {
                     </button>
 
                     {navLinks.map((link, i) => (
-                        <Link key={i} to={link.path} onClick={() => setIsMenuOpen(false)}>
-                            {link.name}
-                        </Link>
+                        link.anchor ? (
+                            <button key={i} type="button" onClick={() => handleNavClick(link)}>
+                                {link.name}
+                            </button>
+                        ) : (
+                            <Link key={i} to={link.path} onClick={() => setIsMenuOpen(false)}>
+                                {link.name}
+                            </Link>
+                        )
                     ))}
 
                   {user &&  <button className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all" onClick={()=> navigate('/owner')}>
