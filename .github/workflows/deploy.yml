@@ -1,5 +1,11 @@
 name: Deploy to GitHub Pages
 
+# Allow the workflow to push built assets to the repository
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 on:
   push:
     branches:
@@ -27,6 +33,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Use a user-created PAT if available, otherwise fall back to GITHUB_TOKEN
+          github_token: ${{ secrets.PERSONAL_TOKEN || github.token }}
           publish_dir: ./dist
           publish_branch: gh-pages
